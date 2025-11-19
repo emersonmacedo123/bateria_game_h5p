@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bateria Game H5P</title>
+    <!-- H5P Standalone Player CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/styles/h5p.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .h5p-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bateria Game H5P</h1>
+        <div class="h5p-container" id="h5p-content">
+            <!-- H5P content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- H5P Standalone Player Script -->
+    <script src="https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/main.bundle.js" charset="UTF-8"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const el = document.getElementById('h5p-content');
+            
+            // Configure H5P Standalone Player
+            // Update h5pJsonPath to point to your H5P content folder
+            const options = {
+                h5pJsonPath: './h5p-conteudos', // Path to extracted H5P content
+                frameJs: 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/frame.bundle.js',
+                frameCss: 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/styles/h5p.css',
+            };
+
+            // Initialize H5P Player
+            // new H5PStandalone.H5P(el, options);
+            
+            // Note: Uncomment the line above when you have H5P content in the h5p-conteudos folder
+            console.log('H5P Standalone Player ready. Add your H5P content to h5p-conteudos folder and uncomment the initialization line.');
+        });
+    </script>
+</body>
+</html>
