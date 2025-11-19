@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bateria Game H5P</title>
-    <!-- H5P Standalone Player CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/styles/h5p.css">
+    <link rel="stylesheet" href="./libs/h5p.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,38 +24,621 @@
             color: #333;
             text-align: center;
         }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+        .game-info {
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-prev {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-prev:hover:not(:disabled) {
+            background-color: #5a6268;
+        }
+        .btn-next {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-next:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        .btn-results {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-results:hover:not(:disabled) {
+            background-color: #218838;
+        }
         .h5p-container {
             margin-top: 20px;
+            min-height: 400px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        /* Estilos para a tela de resultados */
+        .results-screen {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .results-screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .results-header {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .results-header h2 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .overall-score {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .score-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .game-results {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .game-result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .game-result-card.excellent {
+            border-left-color: #28a745;
+        }
+        .game-result-card.good {
+            border-left-color: #ffc107;
+        }
+        .game-result-card.needs-improvement {
+            border-left-color: #dc3545;
+        }
+        .game-result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .game-result-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+        }
+        .game-result-score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .game-result-details {
+            color: #666;
+            font-size: 14px;
+        }
+        .performance-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .badge-excellent {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .badge-good {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .badge-needs-improvement {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn-restart {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+        .btn-restart:hover {
+            background-color: #0056b3;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Bateria Game H5P</h1>
-        <div class="h5p-container" id="h5p-content">
-            <!-- H5P content will be loaded here -->
+        
+        <!-- Tela de Jogo -->
+        <div id="game-screen">
+            <div class="controls">
+                <div class="game-info">
+                    Jogo <span id="current-game">1</span> de <span id="total-games">4</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn-prev" id="btn-prev" onclick="previousGame()">
+                        ← Anterior
+                    </button>
+                    <button class="btn-next" id="btn-next" onclick="nextGame()">
+                        Próximo →
+                    </button>
+                    <button class="btn-results" id="btn-results" onclick="showResults()" style="display: none;">
+                        Ver Resultados 📊
+                    </button>
+                </div>
+            </div>
+
+            <div class="h5p-container" id="h5p-content">
+                <div class="loading">Carregando jogo...</div>
+            </div>
+        </div>
+
+        <!-- Tela de Resultados -->
+        <div id="results-screen" class="results-screen">
+            <div class="results-header">
+                <h2>🎉 Parabéns! Você completou todos os jogos! 🎉</h2>
+                <div class="overall-score" id="overall-score">0%</div>
+                <div class="score-label">Pontuação Geral</div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Jogos Completados</div>
+                    <div class="stat-value" id="games-completed">0/4</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pontuação Média</div>
+                    <div class="stat-value" id="average-score">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Tempo Total</div>
+                    <div class="stat-value" id="total-time">0min</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Melhor Desempenho</div>
+                    <div class="stat-value" id="best-game">-</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 20px 0; color: #333;">Detalhes por Jogo</h3>
+            <div class="game-results" id="game-results-container">
+                <!-- Os resultados serão inseridos aqui via JavaScript -->
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-restart" onclick="restartAllGames()">
+                    🔄 Recomeçar Todos os Jogos
+                </button>
+                <button class="btn-prev" onclick="backToGames()">
+                    ← Voltar aos Jogos
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- H5P Standalone Player Script -->
-    <script src="https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/main.bundle.js" charset="UTF-8"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const el = document.getElementById('h5p-content');
-            
-            // Configure H5P Standalone Player
-            // Update h5pJsonPath to point to your H5P content folder
-            const options = {
-                h5pJsonPath: './h5p-conteudos', // Path to extracted H5P content
-                frameJs: 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/frame.bundle.js',
-                frameCss: 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.9.0/dist/styles/h5p.css',
-            };
+        // Configure seus jogos aqui (ajuste os caminhos conforme seus arquivos extraídos)
+        const games = [
+            {
+                name: 'Partes da Bateria',
+                path: './h5p-conteudos/partes-bateria-1292749384860348487'
+            },
+            {
+                name: 'Caça-palavras sobre Bateria',
+                path: './h5p-conteudos/caca-palavras-sobre-bateria-1292749458404036917'
+            },
+            {
+                name: 'Divisão da Bateria',
+                path: './h5p-conteudos/divisao-da-bateria-1292749373043207307'
+            },
+            {
+                name: 'Flashcard Bateria',
+                path: './h5p-conteudos/flashcard-bateria-1292749452368533487'
+            }
+        ];
 
-            // Initialize H5P Player
-            // new H5PStandalone.H5P(el, options);
+        let currentGameIndex = 0;
+        let h5pInstance = null;
+        let gameCompleted = false;
+        let gameStartTime = null;
+
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = url;
+                s.async = true;
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('Falha ao carregar ' + url));
+                document.head.appendChild(s);
+            });
+        }
+
+        function saveGameResult(score, maxScore, duration) {
+            const results = JSON.parse(localStorage.getItem('gameResults') || '{}');
+            results[currentGameIndex] = {
+                gameName: games[currentGameIndex].name,
+                score: score,
+                maxScore: maxScore,
+                percentage: maxScore > 0 ? Math.round((score / maxScore) * 100) : 0,
+                duration: duration,
+                completedAt: new Date().toISOString()
+            };
+            localStorage.setItem('gameResults', JSON.stringify(results));
+            console.log('Resultado salvo:', results[currentGameIndex]);
+        }
+
+        function unlockNextButton() {
+            gameCompleted = true;
+            const nextBtn = document.getElementById('btn-next');
+            const resultsBtn = document.getElementById('btn-results');
             
-            // Note: Uncomment the line above when you have H5P content in the h5p-conteudos folder
-            console.log('H5P Standalone Player ready. Add your H5P content to h5p-conteudos folder and uncomment the initialization line.');
+            if (currentGameIndex < games.length - 1) {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+                console.log('Jogo completado! Botão "Próximo" desbloqueado.');
+            } else {
+                // Último jogo - mostra botão de resultados
+                nextBtn.style.display = 'none';
+                resultsBtn.style.display = 'inline-block';
+                console.log('Todos os jogos completados! Botão "Ver Resultados" disponível.');
+            }
+        }
+
+        function updateProgress() {
+            const completedGames = JSON.parse(localStorage.getItem('completedGames') || '[]');
+            const progress = (completedGames.length / games.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        async function loadGame(index) {
+            const el = document.getElementById('h5p-content');
+            const game = games[index];
+            
+            // Reset do estado de completado
+            gameCompleted = false;
+            gameStartTime = Date.now();
+            
+            // Destrói a instância anterior se existir
+            if (h5pInstance) {
+                try {
+                    if (window.H5P && window.H5P.externalDispatcher) {
+                        window.H5P.externalDispatcher.off('xAPI');
+                    }
+                    if (h5pInstance.H5P && h5pInstance.H5P.externalDispatcher) {
+                        h5pInstance.H5P.externalDispatcher.off('*');
+                    }
+                } catch (e) {
+                    console.warn('Erro ao limpar instância anterior:', e);
+                }
+                h5pInstance = null;
+            }
+            
+            el.innerHTML = '<div class="loading">Carregando ' + game.name + '...</div>';
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            document.getElementById('current-game').textContent = index + 1;
+            document.getElementById('total-games').textContent = games.length;
+            
+            document.getElementById('btn-prev').disabled = (index === 0);
+            
+            const nextBtn = document.getElementById('btn-next');
+            const resultsBtn = document.getElementById('btn-results');
+            resultsBtn.style.display = 'none';
+            
+            if (index === games.length - 1) {
+                nextBtn.style.display = 'inline-block';
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                const completedGames = JSON.parse(localStorage.getItem('completedGames') || '[]');
+                if (completedGames.includes(index)) {
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                    gameCompleted = true;
+                } else {
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.5';
+                }
+            }
+
+            updateProgress();
+
+            try {
+                el.innerHTML = '';
+                
+                const options = {
+                    h5pJsonPath: game.path,
+                    frameJs: './libs/frame.bundle.js',
+                    frameCss: './libs/h5p.css',
+                };
+
+                if (typeof H5PStandalone === 'undefined' || !H5PStandalone.H5P) {
+                    throw new Error('H5PStandalone não está disponível');
+                }
+
+                h5pInstance = new H5PStandalone.H5P(el, options);
+                
+                setTimeout(() => {
+                    if (window.H5P && window.H5P.externalDispatcher) {
+                        window.H5P.externalDispatcher.on('xAPI', function (event) {
+                            console.log('Evento H5P:', event.getVerb(), event);
+                            
+                            if (event.getVerb() === 'completed' || 
+                                event.getVerb() === 'answered') {
+                                
+                                // Extrai pontuação do evento
+                                const result = event.data?.statement?.result || {};
+                                const score = result.score?.raw || 0;
+                                const maxScore = result.score?.max || 0;
+                                const duration = Math.round((Date.now() - gameStartTime) / 1000); // em segundos
+                                
+                                console.log('Pontuação:', score, '/', maxScore);
+                                
+                                // Salva resultado
+                                saveGameResult(score, maxScore, duration);
+                                
+                                // Marca como completado
+                                const completedGames = JSON.parse(localStorage.getItem('completedGames') || '[]');
+                                if (!completedGames.includes(currentGameIndex)) {
+                                    completedGames.push(currentGameIndex);
+                                    localStorage.setItem('completedGames', JSON.stringify(completedGames));
+                                }
+                                
+                                updateProgress();
+                                unlockNextButton();
+                            }
+                        });
+                    }
+                }, 1000);
+                
+                console.log('Jogo carregado:', game.name);
+            } catch (err) {
+                console.error('Erro ao carregar jogo:', err);
+                el.innerHTML = '<div class="loading" style="color: red;">Erro ao carregar o jogo: ' + err.message + '</div>';
+            }
+        }
+
+        function nextGame() {
+            if (currentGameIndex < games.length - 1 && gameCompleted) {
+                currentGameIndex++;
+                localStorage.setItem('currentGame', currentGameIndex);
+                location.reload();
+            }
+        }
+
+        function previousGame() {
+            if (currentGameIndex > 0) {
+                currentGameIndex--;
+                localStorage.setItem('currentGame', currentGameIndex);
+                location.reload();
+            }
+        }
+
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return mins > 0 ? `${mins}min ${secs}s` : `${secs}s`;
+        }
+
+        function getPerformanceClass(percentage) {
+            if (percentage >= 80) return 'excellent';
+            if (percentage >= 60) return 'good';
+            return 'needs-improvement';
+        }
+
+        function getPerformanceBadge(percentage) {
+            if (percentage >= 80) return '<span class="performance-badge badge-excellent">Excelente! 🌟</span>';
+            if (percentage >= 60) return '<span class="performance-badge badge-good">Bom trabalho! 👍</span>';
+            return '<span class="performance-badge badge-needs-improvement">Continue praticando! 💪</span>';
+        }
+
+        function showResults() {
+            const results = JSON.parse(localStorage.getItem('gameResults') || '{}');
+            const completedGames = Object.keys(results).length;
+            
+            // Calcula estatísticas
+            let totalScore = 0;
+            let totalMaxScore = 0;
+            let totalDuration = 0;
+            let bestGame = { name: '-', percentage: 0 };
+            
+            Object.values(results).forEach(result => {
+                totalScore += result.score;
+                totalMaxScore += result.maxScore;
+                totalDuration += result.duration;
+                if (result.percentage > bestGame.percentage) {
+                    bestGame = { name: result.gameName, percentage: result.percentage };
+                }
+            });
+            
+            const overallPercentage = totalMaxScore > 0 ? Math.round((totalScore / totalMaxScore) * 100) : 0;
+            const averagePercentage = completedGames > 0 ? Math.round(overallPercentage / completedGames * completedGames / games.length) : 0;
+            
+            // Atualiza estatísticas gerais
+            document.getElementById('overall-score').textContent = overallPercentage + '%';
+            document.getElementById('games-completed').textContent = completedGames + '/' + games.length;
+            document.getElementById('average-score').textContent = averagePercentage + '%';
+            document.getElementById('total-time').textContent = formatDuration(totalDuration);
+            document.getElementById('best-game').textContent = bestGame.name !== '-' ? bestGame.percentage + '%' : '-';
+            
+            // Gera cards de resultados
+            const container = document.getElementById('game-results-container');
+            container.innerHTML = '';
+            
+            games.forEach((game, index) => {
+                const result = results[index];
+                if (result) {
+                    const card = document.createElement('div');
+                    card.className = 'game-result-card ' + getPerformanceClass(result.percentage);
+                    card.innerHTML = `
+                        <div class="game-result-header">
+                            <div class="game-result-title">${result.gameName}</div>
+                            <div class="game-result-score">${result.percentage}%</div>
+                        </div>
+                        <div class="game-result-details">
+                            Pontuação: ${result.score} / ${result.maxScore} pontos<br>
+                            Tempo: ${formatDuration(result.duration)}<br>
+                            Concluído em: ${new Date(result.completedAt).toLocaleString('pt-BR')}
+                        </div>
+                        ${getPerformanceBadge(result.percentage)}
+                    `;
+                    container.appendChild(card);
+                } else {
+                    const card = document.createElement('div');
+                    card.className = 'game-result-card';
+                    card.innerHTML = `
+                        <div class="game-result-header">
+                            <div class="game-result-title">${game.name}</div>
+                            <div class="game-result-score">-</div>
+                        </div>
+                        <div class="game-result-details">Não completado</div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+            
+            // Mostra tela de resultados
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('results-screen').classList.add('active');
+        }
+
+        function backToGames() {
+            document.getElementById('results-screen').classList.remove('active');
+            document.getElementById('game-screen').style.display = 'block';
+        }
+
+        function restartAllGames() {
+            if (confirm('Tem certeza que deseja recomeçar todos os jogos? Todo o progresso será perdido.')) {
+                localStorage.removeItem('completedGames');
+                localStorage.removeItem('currentGame');
+                localStorage.removeItem('gameResults');
+                location.reload();
+            }
+        }
+
+        function resetProgress() {
+            restartAllGames();
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' && gameCompleted) {
+                nextGame();
+            } else if (e.key === 'ArrowLeft') {
+                previousGame();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const savedGame = localStorage.getItem('currentGame');
+            if (savedGame !== null) {
+                currentGameIndex = parseInt(savedGame);
+            }
+            
+            try {
+                await loadScript('./libs/main.bundle.js');
+            } catch (e) {
+                console.error('Erro ao carregar H5P script:', e);
+                document.getElementById('h5p-content').innerHTML = 
+                    '<div class="loading" style="color: red;">Erro ao carregar H5P.</div>';
+                return;
+            }
+
+            if (typeof H5PStandalone === 'undefined') {
+                console.error('H5PStandalone não foi carregado');
+                return;
+            }
+
+            loadGame(currentGameIndex);
         });
     </script>
 </body>
