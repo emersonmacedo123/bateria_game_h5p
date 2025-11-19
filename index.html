@@ -436,14 +436,20 @@
             try {
                 el.innerHTML = '';
                 
+                // IMPORTANTE: O H5P Standalone espera o PATH da PASTA, não do JSON
                 const options = {
-                    h5pJsonPath: game.path,
+                    h5pJsonPath: game.path,  // Aponta para a pasta, não para o .json
                     frameJs: './libs/frame.bundle.js',
                     frameCss: './libs/h5p.css',
                 };
 
                 if (typeof H5PStandalone === 'undefined' || !H5PStandalone.H5P) {
                     throw new Error('H5PStandalone não está disponível');
+                }
+
+                // Limpa instâncias globais
+                if (window.H5P && window.H5P.instances) {
+                    window.H5P.instances = [];
                 }
 
                 h5pInstance = new H5PStandalone.H5P(el, options);
